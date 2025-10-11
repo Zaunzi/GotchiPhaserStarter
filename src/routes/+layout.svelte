@@ -1,0 +1,23 @@
+<script lang="ts">
+	import '../app.css';
+	import { browser } from '$app/environment';
+	import Navbar from '$lib/components/Navbar.svelte';
+	
+	// Initialize theme on layout load
+	if (browser) {
+		const mode = localStorage.getItem('mode') || 'dark';
+		document.documentElement.setAttribute('data-mode', mode);
+	}
+
+	let { children } = $props();
+</script>
+
+<svelte:head>
+	<link rel="icon" href="/favicon.svg" />
+</svelte:head>
+
+<Navbar />
+
+<main class="min-h-screen bg-surface-50 dark:bg-surface-900">
+	{@render children?.()}
+</main>
