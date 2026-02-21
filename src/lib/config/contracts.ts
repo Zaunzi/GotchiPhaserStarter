@@ -1,11 +1,11 @@
-import { base, baseSepolia } from '@reown/appkit/networks';
+import { BASE_MAINNET_ID, BASE_SEPOLIA_ID } from './chains';
 
 // Contract addresses for different networks
 export const CONTRACT_ADDRESSES = {
   // Example contract addresses - replace with your actual contracts
   EXAMPLE_CONTRACT: {
-    [baseSepolia.id]: '0x0000000000000000000000000000000000000000', // Base Sepolia
-    [base.id]: '0x0000000000000000000000000000000000000000' // Base Mainnet
+    [BASE_SEPOLIA_ID]: '0x0000000000000000000000000000000000000000', // Base Sepolia
+    [BASE_MAINNET_ID]: '0x0000000000000000000000000000000000000000' // Base Mainnet
   }
 } as const;
 

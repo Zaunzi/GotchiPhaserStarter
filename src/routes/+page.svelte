@@ -15,7 +15,7 @@
 		'@type': 'SoftwareSourceCode',
 		name: 'Sveltekit Web3 Starter',
 		description: 'A production-ready SvelteKit template for building Web3 dApps with Reown AppKit, Ethers, and Skeleton UI.',
-		url: 'https://sveltekit-web3-starter.vercel.app/',
+		url: 'https://www.sks3.lol/',
 		codeRepository: 'https://github.com/Zaunzi/SveltekitWeb3Starter',
 		programmingLanguage: 'TypeScript',
 		author: { '@type': 'Organization', name: 'Zaunzi', url: 'https://github.com/Zaunzi' }
@@ -26,12 +26,12 @@
 	<title>Sveltekit Web3 Starter</title>
 	<meta name="description" content="A production-ready SvelteKit template for building Web3 dApps with Reown AppKit, Ethers, and Skeleton UI. Wallet integration, multi-chain support, and modern UI out of the box." />
 	<meta name="keywords" content="sveltekit, web3, dapp, ethereum, reown, appkit, ethers, skeleton ui, base, wallet connect" />
-	<link rel="canonical" href="https://sveltekit-web3-starter.vercel.app/" />
+	<link rel="canonical" href="https://www.sks3.lol/" />
 	<!-- Open Graph -->
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content="sveltekit web3 starter" />
 	<meta property="og:description" content="A production-ready SvelteKit template for building Web3 dApps with Reown AppKit, Ethers, and Skeleton UI." />
-	<meta property="og:url" content="https://sveltekit-web3-starter.vercel.app/" />
+	<meta property="og:url" content="https://www.sks3.lol/" />
 	<meta property="og:site_name" content="sveltekit web3 starter" />
 	<!-- Twitter -->
 	<meta name="twitter:card" content="summary_large_image" />

@@ -1,7 +1,14 @@
 import { writable, derived } from 'svelte/store'
 import { browser } from '$app/environment'
-import { modal } from '../config/appkit'
-import { base, baseSepolia } from '@reown/appkit/networks'
+import { modal, initAppKit } from '../config/appkit'
+import {
+  BASE_MAINNET_ID,
+  BASE_SEPOLIA_ID,
+  SUPPORTED_CHAIN_IDS,
+  getChainName as getChainNameFromChains,
+  getChainInfo as getChainInfoFromChains,
+  isChainSupported as isChainSupportedFromChains
+} from '../config/chains'
 import type { WalletState, ChainInfo } from '../../app.d.ts'
 
 // Initial state
@@ -85,8 +92,13 @@ function initializeWalletStore() {
   }))
 }
 
-// Initialize when the store is first accessed
-if (browser) {
+/**
+ * Initialize wallet store and AppKit. Call once from the client layout (e.g. onMount).
+ * Idempotent; safe to call multiple times.
+ */
+export async function initWalletStore(): Promise<void> {
+  if (!browser) return
+  await initAppKit()
   initializeWalletStore()
 }
 
@@ -107,19 +119,19 @@ export const walletActions = {
 
   // Switch network
   switchNetwork: async (chainId: number) => {
-    if (modal) {
-      const targetNetwork = [base, baseSepolia].find(net => net.id === chainId)
-      if (targetNetwork) {
-        walletStore.update(state => ({ ...state, isLoading: true, error: undefined }))
-        try {
-          await modal.switchNetwork(targetNetwork)
-        } catch (err) {
-          walletStore.update(state => ({
-            ...state,
-            isLoading: false,
-            error: err instanceof Error ? err.message : 'Failed to switch network'
-          }))
-        }
+    if (!modal) return
+    const { base, baseSepolia } = await import('@reown/appkit/networks')
+    const targetNetwork = [base, baseSepolia].find(net => net.id === chainId)
+    if (targetNetwork) {
+      walletStore.update(state => ({ ...state, isLoading: true, error: undefined }))
+      try {
+        await modal.switchNetwork(targetNetwork)
+      } catch (err) {
+        walletStore.update(state => ({
+          ...state,
+          isLoading: false,
+          error: err instanceof Error ? err.message : 'Failed to switch network'
+        }))
       }
     }
   },
@@ -162,31 +174,8 @@ export const walletActions = {
   }
 }
 
-// Helper functions
-export const getSupportedChainIds = () => [base.id, baseSepolia.id]
-
-export const isChainSupported = (chainId: number) => {
-  return getSupportedChainIds().includes(chainId as any)
-}
-
-export const getChainName = (chainId: number) => {
-  switch (chainId) {
-    case base.id:
-      return 'Base'
-    case baseSepolia.id:
-      return 'Base Sepolia'
-    default:
-      return 'Unknown'
-  }
-}
-
-export const getChainInfo = (chainId: number): ChainInfo => {
-  switch (chainId) {
-    case base.id:
-      return { name: 'Base', symbol: 'ETH', decimals: 18, explorer: 'https://basescan.org' }
-    case baseSepolia.id:
-      return { name: 'Base Sepolia', symbol: 'ETH', decimals: 18, explorer: 'https://sepolia.basescan.org' }
-    default:
-      return { name: 'Unknown', symbol: 'ETH', decimals: 18, explorer: '' }
-  }
-}
+// Helper functions (from chains.ts, re-exported for compatibility)
+export const getSupportedChainIds = () => [...SUPPORTED_CHAIN_IDS]
+export const isChainSupported = isChainSupportedFromChains
+export const getChainName = getChainNameFromChains
+export const getChainInfo = getChainInfoFromChains
