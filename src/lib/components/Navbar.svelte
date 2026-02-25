@@ -4,7 +4,7 @@
 	import ThemeSwitcher from './ThemeSwitcher.svelte';
 	import { Github } from '@lucide/svelte';
 
-	const GITHUB_URL = 'https://github.com/Zaunzi/SveltekitWeb3Starter';
+	const GITHUB_URL = 'https://github.com/Zaunzi/GotchiPhaserStarter';
 </script>
 
 <nav class="navbar bg-surface-50 dark:bg-surface-900 shadow-sm">
@@ -17,7 +17,7 @@
 						<img src="/SKSFAVICON.svg" alt="SKS" class="h-6 w-6 object-contain" />
 					</div>
 					<span class="font-aavegotchi text-xl font-bold text-surface-900 dark:text-surface-100 hidden md:block lowercase">
-						sveltekit web3 starter
+						gotchi phaser starter
 					</span>
 				</a>
 			</div>
@@ -30,7 +30,7 @@
 					rel="noopener noreferrer"
 					class="btn-icon preset-tonal hover:preset-filled border border-surface-300-700 flex items-center justify-center transition-all"
 					title="View on GitHub"
-					aria-label="View template on GitHub"
+					aria-label="View Gotchi Phaser Starter on GitHub"
 					style="min-width: 2.5rem; min-height: 2.5rem;"
 				>
 					<Github size={20} class="text-surface-700 dark:text-surface-300" />
