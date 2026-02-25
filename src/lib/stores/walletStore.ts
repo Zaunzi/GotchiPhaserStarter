@@ -120,8 +120,8 @@ export const walletActions = {
   // Switch network
   switchNetwork: async (chainId: number) => {
     if (!modal) return
-    const { base, baseSepolia } = await import('@reown/appkit/networks')
-    const targetNetwork = [base, baseSepolia].find(net => net.id === chainId)
+    const { base } = await import('@reown/appkit/networks')
+    const targetNetwork = [base].find(net => net.id === chainId)
     if (targetNetwork) {
       walletStore.update(state => ({ ...state, isLoading: true, error: undefined }))
       try {

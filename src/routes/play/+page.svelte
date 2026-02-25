@@ -2,13 +2,11 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { get } from 'svelte/store';
-	import Phaser from 'phaser';
 	import { selectedGotchiStore } from '$lib/stores/selectedGotchiStore';
-	import { getPhaserConfig } from '$lib/phaser/phaserConfig';
 
-	let game: Phaser.Game | null = null;
+	let game: unknown = null;
 
-	onMount(() => {
+	onMount(async () => {
 		const selected = get(selectedGotchiStore);
 		if (!selected?.tokenId) {
 			goto('/');
@@ -18,14 +16,16 @@
 			tokenId: selected.tokenId,
 			name: selected.name
 		};
+		const Phaser = (await import('phaser')).default;
+		const { getPhaserConfig } = await import('$lib/phaser/phaserConfig');
 		game = new Phaser.Game(getPhaserConfig('phaser-game-container'));
 	});
 
 	onDestroy(() => {
-		if (game) {
-			game.destroy(true);
-			game = null;
+		if (game != null && typeof (game as { destroy?: (x: boolean) => void }).destroy === 'function') {
+			(game as { destroy: (x: boolean) => void }).destroy(true);
 		}
+		game = null;
 		(window as Window & { __GOTCHI_PLAY__?: unknown }).__GOTCHI_PLAY__ = undefined;
 	});
 </script>

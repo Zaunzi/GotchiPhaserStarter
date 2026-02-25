@@ -6,7 +6,7 @@ let modal: Awaited<ReturnType<typeof createModal>> | undefined = undefined
 async function createModal() {
   const { createAppKit } = await import('@reown/appkit')
   const { EthersAdapter } = await import('@reown/appkit-adapter-ethers')
-  const { base, baseSepolia } = await import('@reown/appkit/networks')
+  const { base } = await import('@reown/appkit/networks')
 
   const projectId = import.meta.env.VITE_PROJECT_ID
   if (!projectId) {
@@ -16,8 +16,8 @@ async function createModal() {
   const ethersAdapter = new EthersAdapter()
   return createAppKit({
     adapters: [ethersAdapter],
-    networks: [base, baseSepolia],
-    defaultNetwork: baseSepolia,
+    networks: [base],
+    defaultNetwork: base,
     projectId,
     features: {
       email: false,

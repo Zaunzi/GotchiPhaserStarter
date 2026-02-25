@@ -94,27 +94,37 @@
 </svelte:head>
 
 <div class="container mx-auto px-4 py-8 max-w-6xl">
-	<h1 class="font-aavegotchi text-3xl md:text-4xl font-bold text-surface-900 dark:text-surface-100 mb-2 lowercase">
-		Gotchi Phaser
-	</h1>
-	<p class="text-surface-600 dark:text-surface-400 mb-8">
-		Connect your wallet, pick an Aavegotchi, and hit Play to spawn in the world.
-	</p>
+	<div class="text-center mb-8">
+		<h1 class="font-aavegotchi text-3xl md:text-4xl font-bold text-surface-900 dark:text-surface-100 mb-2 lowercase">
+			Gotchi Phaser
+		</h1>
+		<p class="text-surface-600 dark:text-surface-400 max-w-xl mx-auto">
+			Connect your wallet, pick an Aavegotchi, and hit Play to spawn in the world.
+		</p>
+	</div>
 
 	{#if !isWalletConnected}
-		<div class="card p-8 text-center">
-			<Ghost class="w-16 h-16 mx-auto mb-4 text-primary-500 opacity-80" />
-			<p class="text-lg text-surface-700 dark:text-surface-300 mb-6">
-				Connect your wallet to see your Aavegotchis and play.
-			</p>
-			<WalletStatus />
+		<div class="flex flex-col items-center justify-center py-12">
+			<div class="card p-8 text-center max-w-md w-full">
+				<Ghost class="w-16 h-16 mx-auto mb-4 text-primary-500 opacity-80" />
+				<p class="text-lg text-surface-700 dark:text-surface-300 mb-6">
+					Connect your wallet to see your Aavegotchis and play.
+				</p>
+				<div class="flex justify-center">
+					<WalletStatus />
+				</div>
+			</div>
 		</div>
 	{:else if chainId !== BASE_MAINNET_ID}
-		<div class="card p-8 text-center border-warning">
-			<p class="text-surface-700 dark:text-surface-300 mb-4">
-				Please switch to Base network to load your Aavegotchis.
-			</p>
-			<WalletStatus />
+		<div class="flex flex-col items-center justify-center py-4">
+			<div class="card p-8 text-center border-warning max-w-md w-full">
+				<p class="text-lg text-surface-700 dark:text-surface-300 mb-6">
+					Please switch to Base network to load your Aavegotchis.
+				</p>
+				<div class="flex justify-center">
+					<WalletStatus />
+				</div>
+			</div>
 		</div>
 	{:else}
 		{#if error}

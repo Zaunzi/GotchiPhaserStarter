@@ -5,7 +5,7 @@
 export const BASE_MAINNET_ID = 8453
 export const BASE_SEPOLIA_ID = 84532
 
-export const SUPPORTED_CHAIN_IDS = [BASE_MAINNET_ID, BASE_SEPOLIA_ID] as const
+export const SUPPORTED_CHAIN_IDS = [BASE_MAINNET_ID] as const
 
 import type { ChainInfo } from '../../app.d.ts'
 
@@ -15,12 +15,6 @@ export const CHAIN_INFO: Record<number, ChainInfo> = {
     symbol: 'ETH',
     decimals: 18,
     explorer: 'https://basescan.org'
-  },
-  [BASE_SEPOLIA_ID]: {
-    name: 'Base Sepolia',
-    symbol: 'ETH',
-    decimals: 18,
-    explorer: 'https://sepolia.basescan.org'
   }
 }
 
