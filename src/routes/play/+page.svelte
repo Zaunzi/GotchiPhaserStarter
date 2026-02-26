@@ -4,6 +4,8 @@
 	import { get } from 'svelte/store';
 	import { selectedGotchiStore } from '$lib/stores/selectedGotchiStore';
 	import Thumbpad from '$lib/components/Thumbpad.svelte';
+	import ShootThumbpad from '$lib/components/ShootThumbpad.svelte';
+	import MeleeButton from '$lib/components/MeleeButton.svelte';
 
 	let game: import('phaser').Game | null = null;
 	let resizeObserver: ResizeObserver | null = null;
@@ -58,9 +60,11 @@
 <div class="play-root">
 	<div id="phaser-game-container" class="game-container"></div>
 	<p class="hint-overlay" aria-hidden="true">
-		<kbd>W A S D</kbd> or <kbd>Arrow keys</kbd> to move
+		Move: <kbd>W A S D</kbd>. Shoot: <kbd>Left click</kbd>. Melee: <kbd>Right click</kbd>.
 	</p>
 	<Thumbpad />
+	<ShootThumbpad />
+	<MeleeButton />
 </div>
 
 <style>
