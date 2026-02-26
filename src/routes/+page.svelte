@@ -2,17 +2,21 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { account, network } from '$lib/stores/walletStore';
-	import { getAavegotchi, type Aavegotchi } from '$lib/utils/graphql';
+	import { getAavegotchiFromContract } from '$lib/utils/contracts';
 	import { getTokenIdsOfOwner } from '$lib/utils/contracts';
+	import type { Aavegotchi } from '$lib/utils/graphql';
 	import { selectedGotchiStore } from '$lib/stores/selectedGotchiStore';
 	import WalletStatus from '$lib/components/WalletStatus.svelte';
 	import AnimatedStance from '$lib/components/AnimatedStance.svelte';
 	import { BASE_MAINNET_ID } from '$lib/config/chains';
-	import { Loader2, Ghost, Gamepad2 } from '@lucide/svelte';
+	import { Loader2, Ghost, Gamepad2, ArrowUp, ArrowDown, SortAsc, SortDesc } from '@lucide/svelte';
+
+	type SortOption = 'name-asc' | 'name-desc' | 'rarity-desc' | 'rarity-asc';
 
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 	let myGotchis = $state<Aavegotchi[]>([]);
+	let sortBy = $state<SortOption>('rarity-desc');
 	let mounted = $state(false);
 
 	const isWalletConnected = $derived($account.address !== null);
@@ -44,7 +48,7 @@
 				return;
 			}
 
-			const results = await Promise.all(tokenIds.map((id) => getAavegotchi(String(id))));
+			const results = await Promise.all(tokenIds.map((id) => getAavegotchiFromContract(id)));
 			const summoned = results
 				.filter((g): g is Aavegotchi => g !== null && Number(g.status) === 3)
 				.sort((a, b) => Number(a.tokenId) - Number(b.tokenId));
@@ -77,6 +81,24 @@
 	function getSpriteUrl(tokenId: string | number): string {
 		return `https://gotchi.lol/api/gotchi-sprites/${tokenId}`;
 	}
+
+	function sortGotchis(gotchis: Aavegotchi[], order: SortOption): Aavegotchi[] {
+		const list = [...gotchis];
+		switch (order) {
+			case 'name-asc':
+				return list.sort((a, b) => (a.name || `#${a.tokenId}`).localeCompare(b.name || `#${b.tokenId}`));
+			case 'name-desc':
+				return list.sort((a, b) => (b.name || `#${b.tokenId}`).localeCompare(a.name || `#${a.tokenId}`));
+			case 'rarity-desc':
+				return list.sort((a, b) => (b.modifiedRarityScore ?? b.baseRarityScore ?? 0) - (a.modifiedRarityScore ?? a.baseRarityScore ?? 0));
+			case 'rarity-asc':
+				return list.sort((a, b) => (a.modifiedRarityScore ?? a.baseRarityScore ?? 0) - (b.modifiedRarityScore ?? b.baseRarityScore ?? 0));
+			default:
+				return list;
+		}
+	}
+
+	const sortedGotchis = $derived(sortGotchis(myGotchis, sortBy));
 
 	function playWith(gotchi: Aavegotchi) {
 		selectedGotchiStore.set({
@@ -140,19 +162,60 @@
 				<p class="text-surface-600 dark:text-surface-400">Loading your Aavegotchis...</p>
 			</div>
 		{:else if myGotchis.length > 0}
-			<div class="mb-4 flex items-center justify-between">
+			<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
 				<h2 class="text-xl font-semibold text-surface-900 dark:text-surface-100">
 					Choose an Aavegotchi
 				</h2>
-				<button type="button" class="btn btn-outline btn-sm" onclick={() => loadGotchis()} disabled={loading}>
-					{#if loading}
-						<Loader2 class="w-4 h-4 animate-spin" />
-					{/if}
-					Reload
-				</button>
+				<div class="flex flex-wrap items-center gap-2">
+					<span class="text-sm text-surface-600 dark:text-surface-400">Sort by</span>
+					<div class="flex flex-wrap gap-1">
+						<button
+							type="button"
+							class="btn btn-sm {sortBy === 'name-asc' ? 'btn-primary' : 'btn-outline'}"
+							onclick={() => (sortBy = 'name-asc')}
+							title="Name A–Z"
+						>
+							<SortAsc class="w-3.5 h-3.5" />
+							Name
+						</button>
+						<button
+							type="button"
+							class="btn btn-sm {sortBy === 'name-desc' ? 'btn-primary' : 'btn-outline'}"
+							onclick={() => (sortBy = 'name-desc')}
+							title="Name Z–A"
+						>
+							<SortDesc class="w-3.5 h-3.5" />
+							Name
+						</button>
+						<button
+							type="button"
+							class="btn btn-sm {sortBy === 'rarity-desc' ? 'btn-primary' : 'btn-outline'}"
+							onclick={() => (sortBy = 'rarity-desc')}
+							title="Rarity: highest first"
+						>
+							<ArrowDown class="w-3.5 h-3.5" />
+							Rarity ↓
+						</button>
+						<button
+							type="button"
+							class="btn btn-sm {sortBy === 'rarity-asc' ? 'btn-primary' : 'btn-outline'}"
+							onclick={() => (sortBy = 'rarity-asc')}
+							title="Rarity: lowest first"
+						>
+							<ArrowUp class="w-3.5 h-3.5" />
+							Rarity ↑
+						</button>
+					</div>
+					<button type="button" class="btn btn-outline btn-sm" onclick={() => loadGotchis()} disabled={loading}>
+						{#if loading}
+							<Loader2 class="w-4 h-4 animate-spin" />
+						{/if}
+						Reload
+					</button>
+				</div>
 			</div>
 			<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3">
-				{#each myGotchis as gotchi (gotchi.tokenId)}
+				{#each sortedGotchis as gotchi (gotchi.tokenId)}
 					<div class="card p-2 sm:p-3 flex flex-col">
 						<div class="rounded-lg overflow-hidden flex items-center justify-center bg-surface-200 dark:bg-surface-800" style="height: 80px;">
 							<AnimatedStance
@@ -164,6 +227,11 @@
 						<p class="font-semibold text-xs text-surface-900 dark:text-surface-100 truncate mt-1">
 							{gotchi.name || `#${gotchi.tokenId}`}
 						</p>
+						{#if gotchi.modifiedRarityScore != null || gotchi.baseRarityScore != null}
+							<p class="text-[10px] sm:text-xs text-surface-500 dark:text-surface-400 mt-0.5" title="Modified Rarity Score (BRS + wearables)">
+								BRS {(gotchi.modifiedRarityScore ?? gotchi.baseRarityScore) ?? 0}
+							</p>
+						{/if}
 						<button
 							type="button"
 							class="btn btn-primary btn-sm mt-1.5 w-full flex items-center justify-center gap-1.5"

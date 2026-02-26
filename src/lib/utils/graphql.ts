@@ -53,6 +53,10 @@ export interface Aavegotchi {
 	modifiedNumericTraits: number[];
 	equippedWearables: number[];
 	owner: { id: string };
+	/** Base Rarity Score (BRS) – higher = rarer. From contract when using getAavegotchiFromContract. */
+	baseRarityScore?: number;
+	/** Modified Rarity Score (includes wearable bonuses). */
+	modifiedRarityScore?: number;
 	[key: string]: unknown;
 }
 
