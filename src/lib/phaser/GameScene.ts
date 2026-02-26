@@ -12,7 +12,7 @@ const PROJECTILE_SPEED = 400;
 const PROJECTILE_RADIUS = 8;
 const PROJECTILE_MAX_DISTANCE = 900;
 const MELEE_HITBOX_SIZE = 48;
-const MELEE_DURATION_MS = 400;
+const MELEE_DURATION_MS = 550;
 const SHOOT_COOLDOWN_MS = 1000;
 const MELEE_COOLDOWN_MS = 1000;
 
@@ -104,11 +104,11 @@ export default class GameScene extends Phaser.Scene {
 			});
 		}
 		// AnimatedStance: 1=Idle, 2=Sprint, 3=Shoot, 4=Melee, 5=Hurt, 6=... (framesPerRow [6,7,3,6,4,6]). Sheet 10 frames per row.
-		// Shoot = animation 2 (row 1, 7 frames). Melee = animation 3 (row 2, 3 frames).
+		// Shoot = row 2 (3 frames): 14–16. Melee = row 3 (6 frames): 21–26.
 		if (!this.anims.exists('gotchi-shoot')) {
 			this.anims.create({
 				key: 'gotchi-shoot',
-				frames: this.anims.generateFrameNumbers('gotchi', { start: 10, end: 16 }),
+				frames: this.anims.generateFrameNumbers('gotchi', { start: 14, end: 16 }),
 				frameRate: 10,
 				repeat: 0
 			});
@@ -116,8 +116,8 @@ export default class GameScene extends Phaser.Scene {
 		if (!this.anims.exists('gotchi-melee')) {
 			this.anims.create({
 				key: 'gotchi-melee',
-				frames: this.anims.generateFrameNumbers('gotchi', { start: 20, end: 22 }),
-				frameRate: 12,
+				frames: this.anims.generateFrameNumbers('gotchi', { start: 21, end: 26 }),
+				frameRate: 25,
 				repeat: 0
 			});
 		}
@@ -192,8 +192,10 @@ export default class GameScene extends Phaser.Scene {
 		if (len < 10) return;
 		const nx = dx / len;
 		const ny = dy / len;
+
+		// Play shoot animation immediately so it’s in sync with the shot
 		this.actionAnimPlaying = true;
-		this.player.play('gotchi-shoot', true);
+		this.player.play('gotchi-shoot', false);
 		this.lastShootTime = now;
 
 		const orb = this.add.image(this.player.x, this.player.y, 'orb');
