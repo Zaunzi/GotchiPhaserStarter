@@ -3,8 +3,10 @@
 	import { goto } from '$app/navigation';
 	import { get } from 'svelte/store';
 	import { selectedGotchiStore } from '$lib/stores/selectedGotchiStore';
+	import Thumbpad from '$lib/components/Thumbpad.svelte';
 
-	let game: unknown = null;
+	let game: import('phaser').Game | null = null;
+	let resizeObserver: ResizeObserver | null = null;
 
 	onMount(async () => {
 		const selected = get(selectedGotchiStore);
@@ -16,14 +18,32 @@
 			tokenId: selected.tokenId,
 			name: selected.name
 		};
+
+		const el = document.getElementById('phaser-game-container') as HTMLDivElement;
+		if (!el) return;
+
+		const w = el.clientWidth;
+		const h = el.clientHeight;
+
 		const Phaser = (await import('phaser')).default;
 		const { getPhaserConfig } = await import('$lib/phaser/phaserConfig');
-		game = new Phaser.Game(getPhaserConfig('phaser-game-container'));
+		game = new Phaser.Game(getPhaserConfig('phaser-game-container', w, h)) as import('phaser').Game;
+
+		resizeObserver = new ResizeObserver(() => {
+			if (game && el) {
+				const cw = el.clientWidth;
+				const ch = el.clientHeight;
+				game.scale.resize(cw, ch);
+			}
+		});
+		resizeObserver.observe(el);
 	});
 
 	onDestroy(() => {
-		if (game != null && typeof (game as { destroy?: (x: boolean) => void }).destroy === 'function') {
-			(game as { destroy: (x: boolean) => void }).destroy(true);
+		resizeObserver?.disconnect();
+		resizeObserver = null;
+		if (game != null && typeof game.destroy === 'function') {
+			game.destroy(true);
 		}
 		game = null;
 		(window as Window & { __GOTCHI_PLAY__?: unknown }).__GOTCHI_PLAY__ = undefined;
@@ -34,10 +54,50 @@
 	<title>Play – Gotchi Phaser</title>
 </svelte:head>
 
-<p class="text-sm text-surface-600 dark:text-surface-400 px-4 py-2">
-	Use <kbd class="px-1.5 py-0.5 rounded bg-surface-200 dark:bg-surface-700 font-mono text-xs">W A S D</kbd> or
-	<kbd class="px-1.5 py-0.5 rounded bg-surface-200 dark:bg-surface-700 font-mono text-xs">Arrow keys</kbd> to move.
-</p>
-<div class="h-[calc(100vh-4rem-2.5rem)] min-h-[400px] w-full flex flex-col">
-	<div id="phaser-game-container" class="flex-1 w-full min-h-0"></div>
+<!-- Full viewport below navbar (navbar is h-16 = 4rem). No scrollbar. -->
+<div class="play-root">
+	<div id="phaser-game-container" class="game-container"></div>
+	<p class="hint-overlay" aria-hidden="true">
+		<kbd>W A S D</kbd> or <kbd>Arrow keys</kbd> to move
+	</p>
+	<Thumbpad />
 </div>
+
+<style>
+	.play-root {
+		height: calc(100vh - 4rem);
+		height: calc(100dvh - 4rem);
+		min-height: 0;
+		overflow: hidden;
+		position: relative;
+		display: flex;
+		flex-direction: column;
+	}
+	.game-container {
+		flex: 1;
+		min-height: 0;
+		width: 100%;
+		position: relative;
+		overflow: hidden;
+	}
+	.hint-overlay {
+		position: absolute;
+		top: 8px;
+		right: 8px;
+		margin: 0;
+		padding: 6px 10px;
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.8);
+		background: rgba(0, 0, 0, 0.35);
+		border-radius: 8px;
+		pointer-events: none;
+		z-index: 5;
+	}
+	.hint-overlay kbd {
+		padding: 2px 6px;
+		border-radius: 4px;
+		background: rgba(255, 255, 255, 0.2);
+		font-family: inherit;
+		font-size: 0.7rem;
+	}
+</style>

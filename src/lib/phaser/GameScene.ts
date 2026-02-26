@@ -7,11 +7,12 @@ const SPAWN_Y = WORLD_SIZE / 2;
 const SPEED = 160;
 const GOTCHI_FRAME_WIDTH = 100;
 const GOTCHI_FRAME_HEIGHT = 100;
-const GOTCHI_DISPLAY_SIZE = 64;
+const GOTCHI_DISPLAY_SIZE = 128;
 
 declare global {
 	interface Window {
 		__GOTCHI_PLAY__?: { tokenId: string; name?: string };
+		__GOTCHI_MOVE__?: { up: boolean; down: boolean; left: boolean; right: boolean };
 	}
 }
 
@@ -100,10 +101,16 @@ export default class GameScene extends Phaser.Scene {
 	update() {
 		this.velocity.set(0, 0);
 
-		if (this.wasd.W.isDown || this.cursors.up.isDown) this.velocity.y = -SPEED;
-		else if (this.wasd.S.isDown || this.cursors.down.isDown) this.velocity.y = SPEED;
-		if (this.wasd.A.isDown || this.cursors.left.isDown) this.velocity.x = -SPEED;
-		else if (this.wasd.D.isDown || this.cursors.right.isDown) this.velocity.x = SPEED;
+		const touch = window.__GOTCHI_MOVE__;
+		const up = this.wasd.W.isDown || this.cursors.up.isDown || touch?.up;
+		const down = this.wasd.S.isDown || this.cursors.down.isDown || touch?.down;
+		const left = this.wasd.A.isDown || this.cursors.left.isDown || touch?.left;
+		const right = this.wasd.D.isDown || this.cursors.right.isDown || touch?.right;
+
+		if (up) this.velocity.y = -SPEED;
+		else if (down) this.velocity.y = SPEED;
+		if (left) this.velocity.x = -SPEED;
+		else if (right) this.velocity.x = SPEED;
 
 		const dt = this.game.loop.delta / 1000;
 		const isMoving = this.velocity.x !== 0 || this.velocity.y !== 0;

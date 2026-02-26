@@ -1,14 +1,22 @@
 import Phaser from 'phaser';
 import GameScene from './GameScene';
 
-export function getPhaserConfig(parent: string): Phaser.Types.Core.GameConfig {
+/**
+ * Game size is set to the container size so the canvas fills the viewport (full screen).
+ * RESIZE mode keeps the canvas matching the container on resize so no letterboxing and no stretch.
+ */
+export function getPhaserConfig(
+	parent: string,
+	width: number,
+	height: number
+): Phaser.Types.Core.GameConfig {
 	return {
 		type: Phaser.AUTO,
 		parent,
-		width: 800,
-		height: 600,
+		width,
+		height,
 		scale: {
-			mode: Phaser.Scale.FIT,
+			mode: Phaser.Scale.RESIZE,
 			autoCenter: Phaser.Scale.CENTER_BOTH
 		},
 		scene: [GameScene],
