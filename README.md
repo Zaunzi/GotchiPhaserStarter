@@ -1,71 +1,40 @@
-# SvelteKit Web3 Starter
+# Gotchi Phaser Starter
 
-A production-ready SvelteKit template for building Web3 dApps with Reown AppKit, Ethers.js, and Skeleton UI.
+A template for building **Aavegotchi games** with **Phaser** and the **[gotchi.lol](https://gotchi.lol) API**. Uses SvelteKit for the app shell, Reown AppKit for wallet connection, and Phaser for 2D game rendering—with Aavegotchi sprites and data supplied by gotchi.lol.
 
-## Features
+## What’s in the template
 
-- 🔗 **Wallet Integration**: Built-in Reown AppKit for seamless wallet connectivity
-- 🌐 **Multi-Chain Support**: Base Sepolia testnet and Base mainnet out of the box
-- 🎨 **Modern UI**: Skeleton UI with dark/light theme support
-- 📱 **Responsive Design**: Mobile-first approach with Tailwind CSS
-- 🔧 **TypeScript**: Full TypeScript support with proper type definitions
-- ⚡ **SvelteKit**: Fast, modern web framework with excellent developer experience
-- 🧩 **Reusable Components**: Pre-built components for common Web3 interactions
-- 🔄 **Real-time Updates**: Live wallet state and network status updates
-- 💰 **ETH Balance**: Automatic ETH balance fetching and display
-- 📊 **Transaction Handling**: Built-in transaction status tracking and error handling
-- 🚰 **Testnet Faucets**: Built-in links to Base Sepolia faucets for development
-- 🌓 **Theme Switching**: Light/dark mode toggle with persistence
+- 🎮 **Phaser 3** – 2D game engine for Aavegotchi game logic and rendering
+- 👻 **gotchi.lol API** – Fetch and display Aavegotchi sprites and data (e.g. `https://gotchi.lol/api/gotchi-sprites/{tokenId}`)
+- 🔗 **Wallet integration** – Reown AppKit for connecting wallets and using Aavegotchis from the user’s wallet
+- 🌐 **Base** – Configured for Base Sepolia (testnet) and Base mainnet
+- 🎨 **Skeleton UI** – UI and theme (dark/light) for menus and non-Phaser screens
+- 📱 **Responsive** – SvelteKit + Tailwind for layout; Phaser canvas scales as needed
+- 🔧 **TypeScript** – Full TypeScript across Svelte and game code
 
-## Getting Started
+## Getting started
 
 ### Prerequisites
 
-- **Node.js 20.19.0+ or 22.12.0+** (see `.nvmrc` for recommended version)
-  - We recommend using [nvm](https://github.com/nvm-sh/nvm) to manage Node.js versions
-  - Run `nvm use` after cloning to automatically use the correct version
-- **pnpm** (strongly recommended) - see installation instructions below
-- A Reown Cloud project ID
+- **Node.js** 20.19.0+ or 22.12.0+ (see `.nvmrc`; [nvm](https://github.com/nvm-sh/nvm) recommended)
+- **pnpm** (recommended)
 
-### Installing pnpm
-
-This project uses **pnpm** as the package manager. pnpm offers significant advantages:
-
-- 🚀 **Faster installs** - Up to 2x faster than npm
-- 💾 **Disk space efficient** - Uses hard links to save disk space
-- 🔒 **Strict dependency resolution** - Prevents phantom dependencies
-- ✅ **Better monorepo support** - Excellent for large projects
-
-**Install pnpm:**
 ```bash
-# Using npm
+# Install pnpm
 npm install -g pnpm
-
-# Using Homebrew (macOS)
-brew install pnpm
-
-# Using standalone script
-curl -fsSL https://get.pnpm.io/install.sh | sh -
 ```
-
-> ⚠️ **Important:** While npm may work, we strongly recommend using pnpm for the best experience. The project is configured and tested with pnpm.
 
 ### Setup
 
-1. **Clone this repository**
+1. **Clone and enter the repo**
    ```bash
    git clone <your-repo-url>
-   cd template
+   cd GotchiPhaserStarter
    ```
 
-2. **Use the correct Node.js version**
+2. **Use the correct Node version**
    ```bash
-   # If using nvm
    nvm use
-   
-   # Or manually install/use Node.js 20.19.0+
-   nvm install 20.19.0
-   nvm use 20.19.0
    ```
 
 3. **Install dependencies**
@@ -73,244 +42,78 @@ curl -fsSL https://get.pnpm.io/install.sh | sh -
    pnpm install
    ```
 
-4. **Set up environment variables**
+4. **Environment**
    ```bash
    cp env.example .env
    ```
-   
-   Get your project ID from [Reown Cloud](https://cloud.reown.com/) and add it to `.env`:
+   Add your [Reown Cloud](https://cloud.reown.com/) project ID to `.env`:
    ```
    VITE_PROJECT_ID=your_project_id_here
    ```
 
-5. **Start the development server**
+5. **Run the dev server**
    ```bash
    pnpm run dev
    ```
+   Open [http://localhost:5173](http://localhost:5173).
 
-6. **Open your browser**
-   Navigate to [http://localhost:5173](http://localhost:5173)
+## Using the gotchi.lol API
 
-## Project Structure
+The [gotchi.lol](https://gotchi.lol) API provides Aavegotchi sprites and related data for use in your Phaser game.
+
+- **Sprite sheet (PNG)**  
+  `GET https://gotchi.lol/api/gotchi-sprites/{tokenId}`  
+  Returns the full sprite sheet for the given Aavegotchi `tokenId`. Use this URL as the image source when loading sprites in Phaser (e.g. preload, then slice by frame size and row for idle, sprint, attack, etc.).
+
+- **Frame layout**  
+  Sheets are row-based; row indices and frame counts match common Aavegotchi stances (e.g. idle, sprint, wand/throw, melee, hurt, death). Use the same frame dimensions and row layout as gotchi.lol so your Phaser animations line up.
+
+- **Data**  
+  For names, traits, or other on-chain/API data, use the same token IDs with your preferred Aavegotchi/Subgraph or backend API; this template focuses on **Phaser + gotchi.lol sprites** for the game view.
+
+In this repo, Phaser scenes can load a gotchi sprite URL for a given `tokenId` and then animate by row/frame according to your game’s state (idle, moving, attacking, etc.).
+
+## Project structure (relevant to games)
 
 ```
 src/
 ├── lib/
-│   ├── components/
-│   │   ├── ContractInteraction.svelte  # Contract interaction component
-│   │   ├── ETHBalance.svelte           # ETH balance display
-│   │   ├── LightSwitch.svelte          # Theme toggle component
-│   │   ├── Navbar.svelte               # Navigation with wallet connect
-│   │   ├── NetworkStatus.svelte        # Network status display
-│   │   ├── TransactionButton.svelte    # Transaction handling component
-│   │   ├── WalletConnect.svelte        # Enhanced wallet connect component
-│   │   └── WalletStatus.svelte         # Main wallet status component
-│   ├── config/
-│   │   ├── appkit.ts                   # Reown AppKit configuration
-│   │   └── contracts.ts                # Contract configurations
-│   ├── stores/
-│   │   ├── walletStore.ts              # Wallet state management
-│   │   └── index.ts                    # Store exports
-│   ├── utils/
-│   │   └── web3.ts                     # Web3 utility functions
-│   └── mint.css                        # Skeleton UI theme
-├── routes/
-│   ├── +layout.svelte                  # Main layout with navbar
-│   └── +page.svelte                    # Homepage with wallet demo
-├── app.css                             # Global styles
-├── app.d.ts                            # TypeScript definitions
-└── app.html                            # HTML template
+│   ├── components/     # Svelte UI (navbar, wallet, etc.)
+│   ├── config/        # AppKit, contracts
+│   ├── stores/        # Wallet/network state
+│   └── ...
+├── routes/            # SvelteKit pages
+│   ├── +layout.svelte
+│   └── +page.svelte   # Entry; mount Phaser or link to game route
+└── ...
 ```
 
-## Usage
+- **Phaser**: Add or extend scenes under a dedicated folder (e.g. `src/lib/phaser/` or `src/lib/game/`), then create a game config and mount the canvas in a Svelte component or route.
+- **Sprites**: In Phaser, preload the gotchi.lol sprite URL for a token ID, then use frame dimensions and row layout to build animations (idle, move, attack, etc.).
 
-### Wallet Connection
+## Scripts
 
-The template includes a complete wallet integration system:
+- `pnpm run dev` – Development server
+- `pnpm run build` – Production build
+- `pnpm run preview` – Preview production build
+- `pnpm run check` – TypeScript/svelte-check
 
-```typescript
-import { account, network, isWalletConnected, walletActions } from '$lib/stores/walletStore';
+## Networks
 
-// Check if wallet is connected
-if ($isWalletConnected) {
-  console.log('Connected to:', $account.address);
-  console.log('Network:', $network.chainId);
-}
+- **Base Sepolia** (84532) – Testnet  
+- **Base** (8453) – Mainnet  
 
-// Open wallet modal
-walletActions.open();
+Wallet and chain config live in `src/lib/config/appkit.ts`; use the same chain as your Aavegotchi contracts and gotchi.lol.
 
-// Switch network (async)
-await walletActions.switchNetwork(8453); // Base mainnet
-```
+## Learn more
 
-### Blockchain Interactions
-
-Use Ethers.js for blockchain interactions:
-
-```typescript
-import { ethers } from 'ethers';
-import { walletActions } from '$lib/stores/walletStore';
-
-async function getBalance() {
-  const provider = walletActions.getProvider();
-  if (provider) {
-    const ethersProvider = new ethers.BrowserProvider(provider);
-    const balance = await ethersProvider.getBalance(address);
-    return ethers.formatEther(balance);
-  }
-}
-```
-
-### Theme Management
-
-The template includes automatic theme switching:
-
-```typescript
-import { modal } from '$lib/config/appkit';
-
-// Switch to dark mode
-modal.setThemeMode('dark');
-
-// Switch to light mode  
-modal.setThemeMode('light');
-```
-
-## Available Scripts
-
-All scripts should be run with `pnpm`:
-
-- `pnpm run dev` - Start development server
-- `pnpm run build` - Build for production
-- `pnpm run preview` - Preview production build
-- `pnpm run check` - Run TypeScript checks (ensures zero errors/warnings)
-- `pnpm run check:watch` - Run TypeScript checks in watch mode
-
-### Code Quality
-
-This project includes pre-commit hooks (via Husky) that automatically:
-- Run TypeScript type checking (`pnpm run check`)
-- Lint and format staged files with ESLint and Prettier
-
-This ensures code quality and prevents commits with errors or warnings.
-
-## Supported Networks
-
-- **Base Sepolia** (Chain ID: 84532) - Testnet
-- **Base** (Chain ID: 8453) - Mainnet
-
-## Customization
-
-### Adding New Networks
-
-Update `src/lib/config/appkit.ts`:
-
-```typescript
-import { polygon, polygonMumbai } from '@reown/appkit/networks';
-
-// Add to networks array
-networks: [base, baseSepolia, polygon, polygonMumbai]
-```
-
-### Custom Themes
-
-Modify `src/lib/mint.css` or create new theme files in the `src/lib/` directory.
-
-### Adding Components
-
-Create new components in `src/lib/components/` and import them where needed.
-
-## Available Components
-
-### WalletStatus.svelte
-Main wallet connection component with network status, address display, and disconnect functionality.
-
-```svelte
-<WalletStatus />
-```
-
-### ETHBalance.svelte
-Shows the current ETH balance for the connected wallet.
-
-```svelte
-<ETHBalance />
-```
-
-### NetworkStatus.svelte
-Displays current network status and online/offline state.
-
-```svelte
-<NetworkStatus />
-```
-
-### TransactionButton.svelte
-Handles transaction sending with loading states and error handling.
-
-```svelte
-<TransactionButton>
-  Send Transaction
-</TransactionButton>
-```
-
-### ContractInteraction.svelte
-Generic component for interacting with smart contracts.
-
-```svelte
-<ContractInteraction 
-  contractAddress="0x..." 
-  abi={contractABI} 
-  functionName="transfer"
-  args={[recipient, amount]}
->
-  Transfer Tokens
-</ContractInteraction>
-```
-
-### LightSwitch.svelte
-Theme toggle component for switching between light and dark modes.
-
-```svelte
-<LightSwitch />
-```
-
-## Development Tips
-
-### Using pnpm Commands
-
-Replace any `npm` commands with `pnpm`:
-
-```bash
-# Install dependencies
-pnpm install
-
-# Add a new dependency
-pnpm add <package-name>
-
-# Add a dev dependency
-pnpm add -D <package-name>
-
-# Remove a dependency
-pnpm remove <package-name>
-```
-
-### Node.js Version Management
-
-If you're using nvm, the project includes a `.nvmrc` file. Simply run:
-```bash
-nvm use
-```
-
-This will automatically switch to the correct Node.js version (20.19.0).
-
-## Learn More
-
-- [SvelteKit Documentation](https://kit.svelte.dev/docs)
-- [Skeleton UI Documentation](https://skeleton.dev/)
-- [Reown AppKit Documentation](https://docs.reown.com/appkit)
-- [Ethers.js Documentation](https://docs.ethers.org/)
-- [Base Network Documentation](https://docs.base.org/)
-- [pnpm Documentation](https://pnpm.io/)
+- [gotchi.lol](https://gotchi.lol) – Aavegotchi sprite API
+- [Phaser 3](https://phaser.io/) – Game engine
+- [Aavegotchi](https://aavegotchi.com/) – NFT game
+- [SvelteKit](https://kit.svelte.dev/docs)
+- [Reown AppKit](https://docs.reown.com/appkit)
+- [Base](https://docs.base.org/)
 
 ## License
 
-MIT License - feel free to use this template for your projects!
+MIT. Use this template to build your own Aavegotchi games with Phaser and the gotchi.lol API.
